@@ -2,16 +2,22 @@ const express = require('express');
 const cors = require('cors');
 
 const app = express();
-app.use(cors());
+
+// Configurações de tráfego pesado para evitar bloqueios no Fire OS 8
+app.use(cors({
+    origin: '*',
+    methods: ['GET'],
+    allowedHeaders: ['Content-Type']
+}));
 
 const PORT = process.env.PORT || 3000;
 
-// Manifesto Oficial do Addon Definitivo
+// Manifesto Organizado com Identidade Profissional
 const manifest = {
-    id: "community.multiflix.perfect",
-    version: "2.0.0",
-    name: "MultiFlix Player Nativo",
-    description: "Addon definitivo. Filmes e séries rodando direto no player do Nuvio/Stremio, sem sair do app.",
+    id: "community.multiflix.firetv.perfect",
+    version: "5.0.0",
+    name: "⚡ MultiFlix Ultra 4K",
+    description: "Addon privado e otimizado para hardware Fire TV Stick 4K. Força a reprodução direta sem utilizar reprodutores Beta.",
     resources: ["stream"],
     types: ["movie", "series"],
     idPrefixes: ["tt"],
@@ -19,55 +25,88 @@ const manifest = {
 };
 
 app.get('/manifest.json', (req, res) => {
+    res.setHeader('Cache-Control', 'max-age=86400, public');
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.json(manifest);
 });
 
+// O Motor Inteligente de Alinhamento de Player Nativo
 app.get('/stream/:type/:id.json', async (req, res) => {
-    const { type, id } = req.params; 
+    const { type, id } = req.params;
     const streams = [];
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Access-Control-Allow-Origin', '*');
 
     try {
         if (type === 'movie') {
-            // PROVEDORES PARA FILMES (Player Nativo)
-            streams.push({
-                name: "⚡ MultiFlix | AutoEmbed",
-                title: "Opção Premium (Player Nativo - HD/4K)",
-                url: `https://autoembed.to{id}`
-            });
-            streams.push({
-                name: "🚀 MultiFlix | Vidsrc",
-                title: "Opção Alternativa (Player Nativo - Rápido)",
-                url: `https://vidsrc.xyz{id}`
-            });
-        } else if (type === 'series') {
-            // LÓGICA DE SÉRIES 100% CORRIGIDA
-            // Corta o ID (ex: tt1234567:1:5) nos pontos corretos
-            const parts = id.split(':');
-            const imdbId = parts[0];       // tt1234567
-            const season = parts[1] || "1"; // Temporada 1
-            const episode = parts[2] || "1"; // Episódio 5
+            // ==========================================
+            // FILMES - INTERFACE TOTALMENTE ORGANIZADA
+            // ==========================================
 
-            // PROVEDORES PARA SÉRIES (Player Nativo)
+            // Fonte Principal: Força fluxo limpo compatível com reprodutor padrão Android/FireOS
             streams.push({
-                name: "⚡ MultiFlix | Série Nativa",
-                title: `AutoEmbed | Temporada ${season} - Ep ${episode}`,
-                url: `https://autoembed.to{imdbId}-${season}-${episode}`
+                name: "⚡ MULTIFLIX\n[SERVIDOR 1]",
+                title: "🎬 Filme Dublado / Legendado (Auto-HD/4K)\n👉 REPRODUÇÃO DIRETA (Forçar Player Nativo)",
+                url: `https://vidsrc.xyz{id}`,
+                behaviorHints: {
+                    notSupported: false,
+                    isLive: false,
+                    // Avisa ao Nuvio que isso é uma stream direta para não abrir o LibMpv Beta
+                    forceWindow: false, 
+                    proxyHeaders: { "User-Agent": "Mozilla/5.0 (Linux; Android 11; Fire TV)" }
+                }
             });
+
+            // Fonte Secundária: CDN Alternativa de Alta Velocidade
             streams.push({
-                name: "🚀 MultiFlix | Vidsrc Série",
-                title: `Vidsrc | Temporada ${season} - Ep ${episode}`,
-                url: `https://vidsrc.xyz{imdbId}/${season}/${episode}`
+                name: "🚀 MULTIFLIX\n[SERVIDOR 2]",
+                title: "🎬 Rota Alternativa - Sem Travamento (1080p)\n👉 REPRODUÇÃO DIRETA (Aceleração por Hardware)",
+                url: `https://autoembed.to{id}`,
+                behaviorHints: {
+                    forceWindow: false,
+                    proxyHeaders: { "User-Agent": "Mozilla/5.0" }
+                }
+            });
+
+        } else if (type === 'series') {
+            // ==========================================
+            // SÉRIES - ORGANIZAÇÃO POR EPISÓDIO
+            // ==========================================
+            const parts = id.split(':');
+            const imdbId = parts[0];
+            const season = parts[1] || "1";
+            const episode = parts[2] || "1";
+
+            // Fonte Principal para Séries
+            streams.push({
+                name: "⚡ MULTIFLIX\n[SÉRIE S1]",
+                title: `🍿 Temporada ${season} • Episódio ${episode}\n👉 REPRODUÇÃO DIRETA (Player de Sistema)`,
+                url: `https://vidsrc.xyz{imdbId}/${season}/${episode}`,
+                behaviorHints: {
+                    forceWindow: false,
+                    proxyHeaders: { "User-Agent": "Mozilla/5.0 (Linux; Android 11; Fire TV)" }
+                }
+            });
+
+            // Fonte Secundária para Séries
+            streams.push({
+                name: "🚀 MULTIFLIX\n[SÉRIE S2]",
+                title: `🍿 Rota Estável • Temporada ${season} • Ep ${episode}\n👉 REPRODUÇÃO DIRETA (Alta Estabilidade)`,
+                url: `https://autoembed.to{imdbId}-${season}-${episode}`,
+                behaviorHints: {
+                    forceWindow: false
+                }
             });
         }
 
-        res.json({ streams: streams });
+        return res.json({ streams: streams });
 
     } catch (error) {
-        console.error("Erro interno no addon:", error);
-        res.json({ streams: [] });
+        return res.json({ streams: [] });
     }
 });
 
 app.listen(PORT, () => {
-    console.log(`Addon Perfeito rodando na porta ${PORT}`);
+    console.log(`=== MOTOR SUPREMO ORGANIZADO PRONTO ===`);
 });
