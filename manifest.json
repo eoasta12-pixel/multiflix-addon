@@ -1,14 +1,10 @@
 {
-  "id": "community.multiflix.exoplayer.ultimate",
-  "version": "8.0.0",
-  "name": "MultiFlix ExoPlayer Direct",
-  "description": "Servidor bruto de alta estabilidade para ExoPlayer nativo.",
+  "id": "community.multiflix.exoplayer.pure",
+  "version": "9.0.0",
+  "name": "MultiFlix PURE ExoPlayer",
+  "description": "Conexao de midia bruta sem iframes. Desenvolvido para ExoPlayer.",
   "resources": ["stream"],
   "types": ["movie", "series"],
   "idPrefixes": ["tt"],
-  "catalogs": [],
-  "behaviorHints": {
-    "configurable": false,
-    "configurationRequired": false
-  }
+  "catalogs": []
 }
