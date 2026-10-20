@@ -1,10 +1,14 @@
 {
-  "id": "community.multiflix.personal",
-  "version": "1.0.0",
-  "name": "MultiFlix Pessoal",
-  "description": "Meu indexador privado de Iracemaflix, Seriesflix e Rede Canais.",
+  "id": "community.multiflix.exoplayer.ultimate",
+  "version": "8.0.0",
+  "name": "MultiFlix ExoPlayer Direct",
+  "description": "Servidor bruto de alta estabilidade para ExoPlayer nativo.",
   "resources": ["stream"],
   "types": ["movie", "series"],
   "idPrefixes": ["tt"],
-  "catalogs": []
+  "catalogs": [],
+  "behaviorHints": {
+    "configurable": false,
+    "configurationRequired": false
+  }
 }
