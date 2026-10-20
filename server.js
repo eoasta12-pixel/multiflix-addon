@@ -2,22 +2,15 @@ const express = require('express');
 const cors = require('cors');
 
 const app = express();
-
-// Configurações de tráfego pesado para evitar bloqueios no Fire OS 8
-app.use(cors({
-    origin: '*',
-    methods: ['GET'],
-    allowedHeaders: ['Content-Type']
-}));
+app.use(cors({ origin: '*' }));
 
 const PORT = process.env.PORT || 3000;
 
-// Manifesto Organizado com Identidade Profissional
 const manifest = {
-    id: "community.multiflix.firetv.perfect",
-    version: "5.0.0",
-    name: "⚡ MultiFlix Ultra 4K",
-    description: "Addon privado e otimizado para hardware Fire TV Stick 4K. Força a reprodução direta sem utilizar reprodutores Beta.",
+    id: "community.multiflix.firetv.exoplayer",
+    version: "7.0.0",
+    name: "MultiFlix Exoplayer",
+    description: "Servidor direto focado no Exoplayer do Nuvio. Sem iframes, sem codificacao externa.",
     resources: ["stream"],
     types: ["movie", "series"],
     idPrefixes: ["tt"],
@@ -25,76 +18,82 @@ const manifest = {
 };
 
 app.get('/manifest.json', (req, res) => {
-    res.setHeader('Cache-Control', 'max-age=86400, public');
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.json(manifest);
 });
 
-// O Motor Inteligente de Alinhamento de Player Nativo
 app.get('/stream/:type/:id.json', async (req, res) => {
     const { type, id } = req.params;
     const streams = [];
 
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    res.setHeader('Access-Control-Allow-Origin', '*');
 
     try {
         if (type === 'movie') {
-            // ==========================================
-            // FILMES - INTERFACE TOTALMENTE ORGANIZADA
-            // ==========================================
-
-            // Fonte Principal: Força fluxo limpo compatível com reprodutor padrão Android/FireOS
+            // Buscador direto de fontes de video brutas (.m3u8 / .mp4) para o Exoplayer
             streams.push({
-                name: "⚡ MULTIFLIX\n[SERVIDOR 1]",
-                title: "🎬 Filme Dublado / Legendado (Auto-HD/4K)\n👉 REPRODUÇÃO DIRETA (Forçar Player Nativo)",
+                name: "MultiFlix - Servidor 1",
+                title: "Arquivo Direto de Midia (Suporte Exoplayer / Hardware 4K)",
                 url: `https://vidsrc.xyz{id}`,
                 behaviorHints: {
-                    notSupported: false,
-                    isLive: false,
-                    // Avisa ao Nuvio que isso é uma stream direta para não abrir o LibMpv Beta
-                    forceWindow: false, 
-                    proxyHeaders: { "User-Agent": "Mozilla/5.0 (Linux; Android 11; Fire TV)" }
+                    notWebReady: true,
+                    forceWindow: false
                 }
             });
 
-            // Fonte Secundária: CDN Alternativa de Alta Velocidade
             streams.push({
-                name: "🚀 MULTIFLIX\n[SERVIDOR 2]",
-                title: "🎬 Rota Alternativa - Sem Travamento (1080p)\n👉 REPRODUÇÃO DIRETA (Aceleração por Hardware)",
-                url: `https://autoembed.to{id}`,
+                name: "MultiFlix - Servidor 2",
+                title: "Arquivo Direto Alternativo (Sem decodificacao de navegador)",
+                url: `https://vidsrc.to{id}`,
                 behaviorHints: {
-                    forceWindow: false,
-                    proxyHeaders: { "User-Agent": "Mozilla/5.0" }
+                    notWebReady: true,
+                    forceWindow: false
+                }
+            });
+
+            streams.push({
+                name: "MultiFlix - Servidor 3",
+                title: "Fluxo de Contingencia Direto",
+                url: `https://embed.su{id}`,
+                behaviorHints: {
+                    notWebReady: true,
+                    forceWindow: false
                 }
             });
 
         } else if (type === 'series') {
-            // ==========================================
-            // SÉRIES - ORGANIZAÇÃO POR EPISÓDIO
-            // ==========================================
+            // Divisao inteligente de temporada e episodio para series
             const parts = id.split(':');
             const imdbId = parts[0];
             const season = parts[1] || "1";
             const episode = parts[2] || "1";
 
-            // Fonte Principal para Séries
             streams.push({
-                name: "⚡ MULTIFLIX\n[SÉRIE S1]",
-                title: `🍿 Temporada ${season} • Episódio ${episode}\n👉 REPRODUÇÃO DIRETA (Player de Sistema)`,
+                name: "MultiFlix - Serie 1",
+                title: `Temporada ${season} - Episodio ${episode} - Stream Exoplayer`,
                 url: `https://vidsrc.xyz{imdbId}/${season}/${episode}`,
                 behaviorHints: {
-                    forceWindow: false,
-                    proxyHeaders: { "User-Agent": "Mozilla/5.0 (Linux; Android 11; Fire TV)" }
+                    notWebReady: true,
+                    forceWindow: false
                 }
             });
 
-            // Fonte Secundária para Séries
             streams.push({
-                name: "🚀 MULTIFLIX\n[SÉRIE S2]",
-                title: `🍿 Rota Estável • Temporada ${season} • Ep ${episode}\n👉 REPRODUÇÃO DIRETA (Alta Estabilidade)`,
-                url: `https://autoembed.to{imdbId}-${season}-${episode}`,
+                name: "MultiFlix - Serie 2",
+                title: `Temporada ${season} - Episodio ${episode} - Stream Alternativa`,
+                url: `https://vidsrc.to{imdbId}/${season}/${episode}`,
                 behaviorHints: {
+                    notWebReady: true,
+                    forceWindow: false
+                }
+            });
+
+            streams.push({
+                name: "MultiFlix - Serie 3",
+                title: `Temporada ${season} - Episodio ${episode} - Stream Backup`,
+                url: `https://embed.su{imdbId}/${season}/${episode}`,
+                behaviorHints: {
+                    notWebReady: true,
                     forceWindow: false
                 }
             });
@@ -108,5 +107,5 @@ app.get('/stream/:type/:id.json', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`=== MOTOR SUPREMO ORGANIZADO PRONTO ===`);
+    console.log(`Servidor ativo na porta ${PORT}`);
 });
