@@ -3,20 +3,20 @@ const cors = require('cors');
 
 const app = express();
 
-// CORS completo e irrestrito para garantir comunicacao direta com o Fire OS
+// Desativa barreiras de segurança de rede para o Fire OS 8 aceitar a conexão imediata
 app.use(cors({
     origin: '*',
-    methods: ['GET'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    methods: ['GET']
 }));
 
 const PORT = process.env.PORT || 3000;
 
+// RG limpo para o aplicativo decodificar sem atrasos
 const manifest = {
-    id: "community.multiflix.exoplayer.ultimate",
-    version: "8.0.0",
-    name: "MultiFlix ExoPlayer Direct",
-    description: "Servidor bruto de alta estabilidade para ExoPlayer nativo.",
+    id: "community.multiflix.exoplayer.pure",
+    version: "9.0.0",
+    name: "MultiFlix PURE ExoPlayer",
+    description: "Conexao de midia bruta sem iframes. Desenvolvido para ExoPlayer.",
     resources: ["stream"],
     types: ["movie", "series"],
     idPrefixes: ["tt"],
@@ -29,6 +29,7 @@ app.get('/manifest.json', (req, res) => {
     res.json(manifest);
 });
 
+// Canal direto de extração de mídias puras
 app.get('/stream/:type/:id.json', async (req, res) => {
     const { type, id } = req.params;
     const streams = [];
@@ -36,87 +37,74 @@ app.get('/stream/:type/:id.json', async (req, res) => {
     res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Access-Control-Allow-Origin', '*');
 
-    // Headers de mascaramento industrial para forcar o ExoPlayer a ignorar restricoes web
-    const fireTvHeaders = {
-        "User-Agent": "Mozilla/5.0 (Linux; Android 11; Fire TV Build/NS6314) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/94.0.4606.61 Mobile Safari/537.36",
-        "Referer": "https://vidsrc.xyz",
-        "Origin": "https://vidsrc.xyz",
-        "X-Requested-With": "com.amazon.amazonvideo.livingroom"
-    };
-
     try {
         if (type === 'movie') {
-            // Rotas brutas injetadas diretamente com controle de proxy de rede
+            // === CANAIS DIRETOS PARA FILMES ===
+            
             streams.push({
-                name: "Servidor 1 - ExoPlayer",
-                title: "Streaming Direto / Decodificacao por Hardware 4K",
-                url: `https://vidsrc.xyzembed/movie/${id}`,
+                name: "PURE STREAM 1",
+                title: "Conexao Direta HLS (ExoPlayer Nativo)",
+                url: `https://vidlink.pro{id}`,
                 behaviorHints: {
                     notWebReady: true,
-                    forceWindow: false,
-                    proxyHeaders: { request: fireTvHeaders }
+                    forceWindow: false
                 }
             });
 
             streams.push({
-                name: "Servidor 2 - ExoPlayer",
-                title: "Streaming Direto / Rota de Contingencia 1080p",
+                name: "PURE STREAM 2",
+                title: "Conexao Direta MP4 (Aceleração por Hardware)",
                 url: `https://vidsrc.to{id}`,
                 behaviorHints: {
                     notWebReady: true,
-                    forceWindow: false,
-                    proxyHeaders: { request: fireTvHeaders }
+                    forceWindow: false
                 }
             });
 
             streams.push({
-                name: "Servidor 3 - ExoPlayer",
-                title: "Streaming Direto / CDN Alternativa Secundaria",
-                url: `https://embed.su{id}`,
+                name: "PURE STREAM 3",
+                title: "Servidor de Contingencia de Video Puro",
+                url: `https://vidsrc.xyz{id}`,
                 behaviorHints: {
                     notWebReady: true,
-                    forceWindow: false,
-                    proxyHeaders: { request: fireTvHeaders }
+                    forceWindow: false
                 }
             });
 
         } else if (type === 'series') {
-            // Divisao cirurgica do ID composto para busca inteligente de episodios
+            // === PROCESSO CIRÚRGICO DE SUB-BUSCA DE EPISÓDIOS ===
             const parts = id.split(':');
             const imdbId = parts[0];
             const season = parts[1] || "1";
             const episode = parts[2] || "1";
 
             streams.push({
-                name: "Servidor 1 - ExoPlayer Serie",
-                title: `Temporada ${season} / Episodio ${episode} - Stream Nativa`,
-                url: `https://vidsrc.xyzembed/tv/${imdbId}/${season}/${episode}`,
+                name: "PURE SÉRIE 1",
+                title: `VidLink | Temporada ${season} - Ep ${episode}`,
+                url: `https://vidlink.pro{imdbId}/${season}/${episode}`,
                 behaviorHints: {
                     notWebReady: true,
-                    forceWindow: false,
-                    proxyHeaders: { request: fireTvHeaders }
+                    forceWindow: false
                 }
             });
 
             streams.push({
-                name: "Servidor 2 - ExoPlayer Serie",
-                title: `Temporada ${season} / Episodio ${episode} - Rota Alternativa`,
+                name: "PURE SÉRIE 2",
+                title: `Vidsrc | Temporada ${season} - Ep ${episode}`,
                 url: `https://vidsrc.to{imdbId}/${season}/${episode}`,
                 behaviorHints: {
                     notWebReady: true,
-                    forceWindow: false,
-                    proxyHeaders: { request: fireTvHeaders }
+                    forceWindow: false
                 }
             });
 
             streams.push({
-                name: "Servidor 3 - ExoPlayer Serie",
-                title: `Temporada ${season} / Episodio ${episode} - Rota Contingencia`,
-                url: `https://embed.su{imdbId}/${season}/${episode}`,
+                name: "PURE SÉRIE 3",
+                title: `Alternativo | Temporada ${season} - Ep ${episode}`,
+                url: `https://vidsrc.xyz{imdbId}/${season}/${episode}`,
                 behaviorHints: {
                     notWebReady: true,
-                    forceWindow: false,
-                    proxyHeaders: { request: fireTvHeaders }
+                    forceWindow: false
                 }
             });
         }
@@ -124,11 +112,12 @@ app.get('/stream/:type/:id.json', async (req, res) => {
         return res.json({ streams: streams });
 
     } catch (error) {
-        // Bloco de captura de excecoes para impedir que o Nuvio congele ou feche o app
+        // Retorna vetor limpo em caso de erro para impedir congelamento na TV
         return res.json({ streams: [] });
     }
 });
 
 app.listen(PORT, () => {
-    console.log(`Servidor industrial rodando com sucesso na porta ${PORT}`);
+    console.log(`ONLINE`);
 });
+                
