@@ -1,0 +1,10 @@
+{
+  "id": "community.multiflix.personal",
+  "version": "1.0.0",
+  "name": "MultiFlix Pessoal",
+  "description": "Meu indexador privado de Iracemaflix, Seriesflix e Rede Canais.",
+  "resources": ["stream"],
+  "types": ["movie", "series"],
+  "idPrefixes": ["tt"],
+  "catalogs": []
+}
